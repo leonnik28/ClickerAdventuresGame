@@ -9,7 +9,10 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        _movement.Move(_inputVector);
+        if (Time.timeScale == 1f)
+        {
+            _movement.Move(_inputVector);
+        }
     }
 
     private void OnMove(InputValue value)
