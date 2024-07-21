@@ -1,0 +1,25 @@
+ManifestFileVersion: 0
+CRC: 4175499271
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 2cee22c108a32d5146a8ebd7466b6ee3
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: b30fce1a9ad74efb72be6c308c56e365
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Materials/Spider_Eye.mat
+- Assets/Materials/SH3.mat
+- Assets/Materials/Spinnen_Bein_tex_COLOR_.mat
+- Assets/Materials/Spider_teeth.mat
+- Assets/Materials/Box.mat
+Dependencies: []

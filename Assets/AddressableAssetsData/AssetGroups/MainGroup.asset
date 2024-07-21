@@ -10,15 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: ClickerGroup
+  m_Name: MainGroup
   m_EditorClassIdentifier: 
-  m_GroupName: ClickerGroup
+  m_GroupName: MainGroup
   m_Data:
     m_SerializedData: []
   m_GUID: f3b15fbc6bd7bcc4faa43c485caba02a
   m_SerializeEntries:
   - m_GUID: 1b0d077e406296242a1c0577b0e479e5
     m_Address: ClickHere
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 533e506794a67c84bb048e9f4b7cceb5
+    m_Address: Assets/Prefabs/Walker/Player.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

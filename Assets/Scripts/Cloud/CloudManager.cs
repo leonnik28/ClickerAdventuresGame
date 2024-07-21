@@ -2,10 +2,32 @@ using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class CloudManager
 {
+    private const string PACKAGE_NAME = "AssetBundles";
+    private const string URL = "https://caf3f374-8590-4518-851a-a4472a007def.client-api.unity3dusercontent.com/client_api/v1/environments/server/buckets/0ecf1d6b-b540-404f-9607-d731abb983ce/release_by_badge/latest/entry_by_path/content/?path=";
+
+    public async Task<GameObject> GetPrefab(string prefabName)
+    {
+        GameObject prefab = null;
+        if (prefab == null)
+        {
+            prefab = CheckPrefabToDowload(prefabName);
+        }
+        if (prefab == null)
+        {
+            prefab = await DowloadPrefab(prefabName, PACKAGE_NAME);
+        }
+        if (prefab == null)
+        {
+            Debug.Log("Prefab not found");
+        }
+        return prefab;
+    }
+
     public async Task<Texture> GetTexture(string textureName)
     {
         Texture texture = null;
@@ -22,6 +44,51 @@ public class CloudManager
             Debug.Log("Texture not found");
         }
         return texture;
+    }
+
+    private GameObject CheckPrefabToDowload(string prefabName)
+    {
+        string path = Application.persistentDataPath + "/" + prefabName + ".unity3d";
+        if (File.Exists(path))
+        {
+            AssetBundle bundle = AssetBundle.LoadFromFile(path);
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+            bundle.Unload(false);
+            return prefab;
+        }
+        return null;
+    }
+
+    private async Task<GameObject> DowloadPrefab(string prefabName, string packageName)
+    {
+        string url = URL + packageName;
+
+        using (UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(url))
+        {
+            request.SendWebRequest();
+
+            while (!request.isDone)
+            {
+                await Task.Yield();
+            }
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                AssetBundle assetBundle = DownloadHandlerAssetBundle.GetContent(request);
+                GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
+
+                string path = Application.persistentDataPath + "/" + packageName + ".unity3d";
+                File.WriteAllBytes(path, request.downloadHandler.data);
+
+                assetBundle.Unload(false);
+                return prefab;
+            }
+            else
+            {
+                Debug.Log("Failed to download AssetBundle: " + request.error);
+                return null;
+            }
+        }
     }
 
     private Texture2D CheckTextureToDowload(string textureName)
@@ -55,7 +122,7 @@ public class CloudManager
         }
         else
         {
-            Debug.Log("Failed to download image: " + handle.OperationException);
+            Debug.Log("Failed to download texture: " + handle.OperationException);
             Addressables.Release(handle);
             return null;
         }
