@@ -3,13 +3,10 @@ using Zenject;
 
 public class MainMenuController : MonoBehaviour
 {
-    public Texture2D ClickerTexture => _clickerTexture;
+    public string TextureName = "ClickHere";
 
     [SerializeField] private GameObject _clicker;
     [SerializeField] private GameObject _walker;
-    [SerializeField] private string _imageKey = "ClickHere";
-
-    private Texture2D _clickerTexture;
 
     private CloudManager _loadManager;
 
@@ -36,6 +33,6 @@ public class MainMenuController : MonoBehaviour
 
     public async void LoadTexture()
     {
-        _clickerTexture = (Texture2D)await _loadManager.GetTexture(_imageKey);
+        await _loadManager.GetTexture(TextureName);
     }
 }
