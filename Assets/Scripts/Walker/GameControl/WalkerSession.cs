@@ -1,4 +1,5 @@
 using UnityEngine;
+using Zenject;
 
 public class WalkerSession : MonoBehaviour
 {
@@ -12,8 +13,19 @@ public class WalkerSession : MonoBehaviour
     private float _startTime;
     private float _currentTime;
 
-    private void OnEnable()
+    private readonly string _saveKey = "WalkerData";
+
+    private StorageService _storageService;
+
+    [Inject]
+    private void Construct(StorageService storageService)
     {
+        _storageService = storageService;
+    }
+
+    private async void OnEnable()
+    {
+        _walkerData = await _storageService.LoadAsync<WalkerData>(_saveKey);
         FinishTarget.OnFinishTrigger += FinishGame;
         StartGame();
     }
@@ -25,24 +37,30 @@ public class WalkerSession : MonoBehaviour
 
     public void StartGame()
     {
-        _playerSpawn.SpawnPlayer();
         Time.timeScale = 1f;
 
         _startTime = Time.time;
         _currentTime = 0f;
     }
 
-    private void FinishGame()
+    private async void FinishGame()
     {
         Time.timeScale = 0f;
         _currentTime = Time.time - _startTime;
         CheckTime();
         _walkerData.Score++;
+
+        await _storageService.SaveAsync(_saveKey, _walkerData);
         _winUI.SetActive(true);
     }
 
     private void CheckTime()
     {
+        if (_walkerData.BestTime == 0)
+        {
+            _walkerData.BestTime = _currentTime;
+            return;
+        }
         if (_currentTime < _walkerData.BestTime)
         {
             _walkerData.BestTime = _currentTime;

@@ -1,16 +1,7 @@
 ManifestFileVersion: 0
-CRC: 1789159567
+CRC: 4240984683
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
-      Name: model.player
-      Dependencies:
-        Dependency_0: mat
-    Info_1:
       Name: player
-      Dependencies:
-        Dependency_0: model.player
-        Dependency_1: mat
-    Info_2:
-      Name: mat
       Dependencies: {}

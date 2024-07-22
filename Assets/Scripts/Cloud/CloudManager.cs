@@ -7,7 +7,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class CloudManager
 {
-    private const string PACKAGE_NAME = "AssetBundles";
+    private const string PACKAGE_NAME = "player";
     private const string URL = "https://caf3f374-8590-4518-851a-a4472a007def.client-api.unity3dusercontent.com/client_api/v1/environments/server/buckets/0ecf1d6b-b540-404f-9607-d731abb983ce/release_by_badge/latest/entry_by_path/content/?path=";
 
     public async Task<GameObject> GetPrefab(string prefabName)
@@ -46,9 +46,27 @@ public class CloudManager
         return texture;
     }
 
+    public void DeletePrefab(string prefabName)
+    {
+        string path = Application.persistentDataPath + "/" + prefabName;
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+    }
+
+    public void DeleteTexture(string textureName)
+    {
+        string path = Application.persistentDataPath + "/" + textureName + ".png";
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+    }
+
     private GameObject CheckPrefabToDowload(string prefabName)
     {
-        string path = Application.persistentDataPath + "/" + prefabName + ".unity3d";
+        string path = Application.persistentDataPath + "/" + prefabName;
         if (File.Exists(path))
         {
             AssetBundle bundle = AssetBundle.LoadFromFile(path);
@@ -74,14 +92,29 @@ public class CloudManager
 
             if (request.result == UnityWebRequest.Result.Success)
             {
+                UnityWebRequest www = UnityWebRequest.Get(url);
+
+                www.SendWebRequest();
+
+                while (!www.isDone)
+                {
+                    await Task.Yield();
+                }
+
                 AssetBundle assetBundle = DownloadHandlerAssetBundle.GetContent(request);
-                GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
+                GameObject[] prefabs = assetBundle.LoadAssetWithSubAssets<GameObject>(prefabName);
 
-                string path = Application.persistentDataPath + "/" + packageName + ".unity3d";
-                File.WriteAllBytes(path, request.downloadHandler.data);
+                if (prefabs.Length > 0)
+                {
+                    GameObject prefab = prefabs[0];
 
-                assetBundle.Unload(false);
-                return prefab;
+                    string path = Application.persistentDataPath + "/" + packageName;
+                    File.WriteAllBytes(path, www.downloadHandler.data);
+
+                    assetBundle.Unload(false);
+                    return prefab;
+                }
+                return null;
             }
             else
             {
